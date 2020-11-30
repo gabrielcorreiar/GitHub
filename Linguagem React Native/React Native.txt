@@ -1,0 +1,86 @@
+Iniciar um Projeto REACT NATIVE
+
+1. Abrir o Prompt de comando
+
+	mkdir - nome da pasta
+	cd nome da pasta
+
+2. depois de entrar dentro da pasta usar o comando:
+
+	react-native init (nome do projeto) - Desta forma o projeto será inicializado
+
+3. A seguir entrar na pasta do Projeto e executar o comando: (o emulador pode se inicar já aqui)
+
+	react-native run-android
+
+
+	####Se der erro é necessário abrir o Projeto no android estúdio
+
+4. Terminando de Buildar usamos novamente o mesmo comando para abrir o emulador
+
+	react-native run-android
+
+4. Ou podemos abrir pelo android Studio
+
+
+5. É OBRIGATÓRIO DEIXAR AS ABAS DO CMD QUE ABREM ABERTAS.
+
+
+
+--------------------------------------------------------------------
+
+VARIÁVEL 
+
+let (nome da variavel) - isto é como se inicializa uma variavel
+
+const (nome da constante) - assim se inicia uma constante
+
+State - é uma variével que controla toda a renderização do código. (quando vc altera o valor dela, você renderiza a tela)
+	(pode deixar o app mais lento pois renderiza toda hora)
+
+Props - é uma variável que transmite as informações entre componentes e classes (sempre que for passar informação para outro lugar
+	posso usar a variavel props)
+
+################################ EXEMPLO #############################
+
+- CRIAÇÃO DE VARIAVEL
+- JUNTANDO ARRAYS
+- CRIANDO UMA FUNÇÃO COM RETURN
+
+import React from 'react';
+import {
+  StyleSheet,
+  View,
+  Text} from 'react-native';
+
+  class App extends React.Component {
+
+    teste = (text, text2) => {
+      return "OLA MUNDO" + text + text2;
+    }
+
+    render() {
+
+    let array1 = [1, 2, 3]
+    let array2 = [...array1,4, 5, 6]
+      let abc = this.teste('do Gabriel', ' Correia')
+      return (
+        <View style={styles.container}>
+          <Text style={styles.textInfo}> {abc} </Text>
+      <Text>{array2}</Text>
+        </View>
+      )
+    }
+  }
+  const styles = StyleSheet.create({
+    container: {
+      flexDirection: 'column',
+      flex: 1,
+      justifyContent: 'center',    
+    },
+    textInfo: {
+      fontSize: 50,
+      textAlign: 'center',
+    }
+  });
+  export default App;

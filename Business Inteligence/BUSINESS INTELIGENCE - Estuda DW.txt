@@ -1,0 +1,10 @@
+Tipos de banco de dados em BI
+
+Modelo Estrela - Star Schema (utilizado no projeto MovJud) - é um banco de dados desnormalizado.
+
+Modelo Floco de Neve - Snow Flake Schema - é um bando de dados normalizado.
+
+	Banco de dados normalizado = Redundancia de informado é quase nula.
+	Banco de dados desnormalizado = É um banco de dados que você pode repetir a informação.
+
+

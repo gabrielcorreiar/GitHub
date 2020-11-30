@@ -1,0 +1,296 @@
+LINGUAGEM DERIVADA DO JAVA PARA O USO EM DESENVOLVIMENTO MOBILE
+
+ULR: https://try.kotlinlang.org/#/Examples/Hello,%20world!/Simplest%20version/Simplest%20version.kt
+
+PONTOS DE ATENÇÃO:
+
+	- RODA COM JVM
+	- PODE SER TIPADA
+	- PRINTAR NA TELA:  println("Hello, world!"+ a + b + c)
+	- AO CRIAR UMA VARIAVEL NULL É OBRIGATÓRIO PASSAR A SUA TIPAGEM.
+	- A CLAUSULA IF É IGUAL DAS OUTRAS LINGUAGENS
+	- O SWICTH NO KOTLHIN É O WHEN
+	- TEMOS OS ENUM
+	
+	OPERADORES LÓGICOS
+
+		&& - AND
+		|| - OR
+		! - NOT
+
+	- CLASSE COM A PALAVRA (OPEN) NA FRENTE PODE SER HERDADA
+	- USANDO A PALAVRA OVERRIDE VOCÊ PODE UTILIZAR METODOS DE OUTRAS CLASSES
+	- DENTRO DE CLASSES TEMOS OS METODOS
+
+--------------------------------------------------------------
+
+	- ANDROID STUDIO
+		-ADROIDMANIFEST.XML - é a pasta onde ficam as permisões
+
+	- TESTE É FEITO NO EMULADOR
+
+VARIÁVEIS:
+	
+	- CRIA-SE UMA VARIAVEL UTILIZANDO O (VAR) E PODEMOS CRIAR UMA CONSTANTE COM O (VAL)
+		var a = 10 
+		var b: Int = 100 - VARIÁVEL TIPADA
+		val c = 10 - CONSTANTE
+
+	- VARIAVEL COM O VALOR NULL DEFAULT - PRECISA DO PONTO DE ?
+		var aa: String? = null
+
+
+COLLECTION:
+
+	- TEMOS 3 TIPOS NO KOTHIN: ARRAYS, LISTS, MAPS.
+		
+		ARRAYS - COLEÇÕES DE MESMO TIPO, NÃO SÃO ORDENADOS E ACEITAM DUPLICIDADES.
+			
+			var firstArray = arrayOf<String>() - CRIAÇÃO DE UM ARRAY VAZIO.
+			var secondArray = arrayOf<String>("leite", "pão") - CRIAÇÃO DE UM ARRAY COM VALORES. (MELHOR OPÇÃO)
+			var thirtArray = arrayOf("casa","carro","janela") - CRIAÇÃO DE UM ARRAY COM VALORES SEM PASSAR A TIPAGEM DO ARRAY.
+			
+			fun main(args: Array<String>) {
+    
+				var firstArray = arrayOf<String>() // CRIAÇÃO DE UM ARRAY VAZIO.
+				var secondArray = arrayOf<String>("leite", "pão") // CRIAÇÃO DE UM ARRAY COM VALORES. (MELHOR OPÇÃO)
+				var thirtArray = arrayOf("casa","carro","janela") // CRIAÇÃO DE UM ARRAY COM VALORES SEM PASSAR A TIPAGEM DO ARRAY.
+    
+    				if (thirtArray.isEmpty()) {
+                			println("ARRAY VAZIO")
+            			} else {
+                			println("ARRAY CHEIO")
+            			}
+    
+    				println("NOSSO ARRAY TEM ${thirtArray.size} ITENS") // $ me parece que concatena itens e as {} ajudam a printar no meio da exibição
+  
+			}
+
+
+		LIST/ARRAYLIST - COLEÇÕES DE VÁRIOS TIPOS, PODE ATÉ ORDENAR E ACEITAM DUPLICIDADES.
+
+
+
+			fun main(args: Array<String>) {
+    
+ 				var jogos = ArrayList<String>() // CRIANDO UM ARRAYLIST DO TIPO STRING PORÉM VAZIO
+    
+    				jogos.addAll(listOf(
+    						"COD",
+    						"LOL",
+    						"COUNTER STRIKE",
+    						"WARZONE"
+    				)) // ADICIONANDO ITENS NESSE ARRAYLIST
+    
+				println(jogos) // EXIBINDO OS ITENS DO ARRAYLIST
+				println(jogos.count()) // CONTANDO QUANTOS ITENS TEM NO ARRAY
+
+				var a = 1
+    				for (jogos in jogos) {
+        				println(jogos +" - NÚMERO "+ a)
+       					a++
+    				} // FOR LISTANDO TODOS OS ITENS DO ARRAYLIST E EXIBINDO SEU NÚMERO
+
+
+
+				if (jogos.contains("LOL")) {
+    					println("O JOGO LOL EXISTE NESSE ARRAYLIST")
+				} else {
+    					println("O JOGO PESQUISADADO NÃO EXISTE NESSE ARRAYLIST ")
+				} // VERIFICANDO SE O JOGO EXISTE NESSE ARRAYLIST
+
+    
+				var filmes = ArrayList<String> () // CRIANDO UM ARRAYLIST DO TIPO STRING VAZIO
+    
+				filmes.add("HOMEM-ARANHA")// INSERINDO SOMENTE UM VALOR A ELE
+
+				println(filmes)
+
+				filmes.add("HOMEM-ARANHA")// INSERINDO O MESMO REGISTRO DUAS VEZES POR QUÊ O ARRAYLIST ACEITA DUPLICIDADE
+
+				println(filmes.count())// CONTANDO QUANTOS VALORES TEM NA VARIAVEL FILMES
+
+				filmes.remove("HOMEM-ARANHA") // ESSA FUNÇÃO REMOVE DELETA ITENS DO ARRAY
+ 
+
+				var pessoas = listOf(
+				"GABRIEL",
+				"LAURA",
+				"JOÃO",
+				"MARIA"
+				) // CRIANDO UM LIST DE UMA FORMA MAIS SIMPLIFICADA
+
+				println(pessoas)
+    
+				var tudoJunto = jogos + filmes + pessoas // COLOCANDO O VALOR DE TODOS OS LISTS JUNTOS EM UMA VARIAVEL
+				println(tudoJunto)
+			}
+
+		MAP - CONTROLO DUPLICIDADE, CONSIGO ORDENAR.
+			
+			fun main(args: Array<String>) {
+
+				var movies = HashSet<String> () // CRIEI UMA VARIAVEL DO TIPO MAP
+    
+				var catalog = listOf(
+    						"SPIDER - MAN",
+    						"TITANIC",
+    						"APIMENTADAS",
+    						"HULK",
+						"AMERICAN PIE",
+						"VELOZES E FURIOSOS",
+						"TITANIC"
+				) // CRIEI UMA VARIAVEL COM ESSA LISTA DE ITENS
+    
+				movies.addAll(catalog) // ADICIONEI ESSA LISTA DE ITENS A MINHA VARIAVEL MAP
+    
+ 				println(movies) // PRINTANDO NA TELA PODEMOS VER QUE ELA EXIBE DE FORMA ORDENADA OS CAMPOS E SEM REPETIR
+			}
+
+
+
+OPERADOR TERNÁRIO:
+
+	fun main(args: Array<String>) {
+
+		var valor = 8
+    	
+		var result = if (valor > 7) "Aprovado" else "Reprovado"
+		println(result)
+    				
+	}
+
+OPERADOR CLOSE RANGER (..) [SÃO OS DOIS PONTOS - VAI DO INICIO AO FIM]
+
+	fun main(args: Array<String>) {
+
+    		var valor = 8..80 // ELE PEGA A RANGE DE VALORES ENTRE O NUMERO 8 E 80
+    
+   		 for (valr in valor) {
+        		println(valr) // VAI EXIBIR NÚMEROS ENTRE 8 E 80
+    		}
+		
+	}
+
+OPERADOR HALF CLOSE RANGER (UNTIL) 
+
+	fun main(args: Array<String>) {
+
+    		var valor = (8 until 80) // ELE PEGA A RANGE DE VALORES ENTRE O NUMERO 8 E 79
+    
+    		for (valr in valor) {
+        		println(valr) // VAI EXIBIR NÚMEROS ENTRE 8 E 79
+    		}
+		
+	}
+
+OPERADOR ELVIS (?:) - DETERMINA SE O VALOR QUE ESTOU RECEBENDO É NULO -- PODEMOS UTILIZAR NO ACESSO AO BANCO DE DADOS (PODEMOS USAR PARA VERIFICAÇÃO DE CONEXÃO)
+
+	fun main(args: Array<String>) {
+
+    		var valor: Int?= null
+    
+    		var valorB = valor ?: 0 // ELE FAZ UMA VERFICAÇÃO E CASO O VALOR DA VARIALVEL (VALOR) SEJA NULA ELA PASSA A RECEBER 0 
+    
+    		println(valorB)
+		
+	}
+
+CLAUSUA WHEN - (PARECIDO COM O SWICTCH CASE DE OUTRAS LINGUAGENS)
+
+	fun main(args: Array<String>) {
+
+    		var valor = 787
+    
+    		when (valor % 2) {
+        		0 -> // SE O RESTO DA DIVISÃO FOR 0 É UM NUMERO PAR 
+        			println("$valor é par")
+        		else -> // SE NÃO ELE É IMPAR
+        			println("$valor é impar")
+    		}
+    		
+	}
+
+
+CLAUSULA WHEN COM CLOSE RANGER
+
+	fun main(args: Array<String>) {
+
+    		var letra = "k"
+    
+    		when (letra) {
+        		in "a".."f" ->
+        			println("Você é da turma 1")
+        		in "g".."l" ->
+        			println("você é da turma 2")
+        		else ->
+        			println("você é da turma 3")
+    		}
+    		
+	}
+
+
+WHILE
+
+	fun main(args: Array<String>) {
+
+    		var valor = 12
+    
+    		while (valor > 0) {
+        		println("você tem $valor coletes")
+        		valor = valor - 1
+    		}
+   		
+	}
+
+DO WHILE 
+
+
+	fun main(args: Array<String>) {
+
+    		var valor = 12
+    
+    		do{
+         		println("você tem $valor coletes")
+         		valor = valor - 1
+    		} while (valor >- 0) 
+       	
+	}
+
+ENUMERADOR
+
+
+	//Definindo um enum fora da função main
+	enum class Compass {
+    		north,
+    		east,
+    		west,
+    		south
+	}
+	fun main(args: Array<String>) {
+    		//Criando uma variável do tipo Compass
+    		var direction = Compass.north
+    		//Como Kotlin trabalha com inferência de tipo, podemos usar
+    		// somente .valor, caso o tipo seja definido explicitamente
+    		var direction2: Compass = Compass.south //ESTÁ PASSANDO A VARIAVEL DIRECTION2 PARA O MESMO TIPO DA VARIAVEL COMPASS
+    		println("Minha direção é $direction")
+    		//Minha direção é north
+    		//Enums são muito usados com switch para análise do valor
+    		when (direction) {
+        		Compass.north -> 
+            			println("Estamos indo para o norte")
+        		Compass.south ->
+           			println("Estamos indo para o sul")
+        		Compass.east ->
+            			println("Estamos indo para o leste")
+        		Compass.west ->
+            			println("Estamos indo para o oeste")
+    	}
+	//Estamos indo para o norte
+	
+	//Outra forma de apresentar informações de um Enum
+    	Compass.values().forEach {
+        println(it)
+    }
+}
+
