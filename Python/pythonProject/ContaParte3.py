@@ -19,3 +19,6 @@ class Conta:
 
     def sacar(self,valor):
         self.saldo -= valor
+
+    ##ex: conta =  Conta(123,"Gabriel", 100, 1000)
+    ##    conta = None -> Deste modo desreferenciando a varial conta do objeto Conta.
