@@ -188,5 +188,57 @@ Python -> é utlizado para fazer analise. Tratar arquivo desestruturado. -> estu
 
 Aprender o basico de linux
 
+cd.. - entra/sai da pasta
+ls - lista arquivos
+mkdir - cria diretório
+
 
 #####################################################################
+
+COMANDOS HADOOP (EXECUTADOS NO TERMINAL):
+
+VERIFICA O AMBIENTE:
+
+	hadoop version
+	javac -version
+
+PREPARA AMBIENTE:
+
+	export HADOOP_CLASSPATH=$(hadoop classpath)
+	echo $HADOOP_CLASSPATH
+
+LE O ARQUIVO NECESSÁRIO:
+
+	hadoop fs -mkdir /wordCountTutorial
+	hadoop fs -mkdir /wordCountTutorial/Input
+
+Começa a rodar o arquivo
+
+	hadoop fs -put 'local do arquivo' /wordCountTutorial/Input
+
+
+#####################################################################
+
+O QUE FAÇO DA VIDA?
+TENHO 22 ANOS, SOU DE SAO PAULO, JA MOREI EM PORTUGAL. TRABALHO COM BI NA GLOBAL HITSS ATENDENDO O TJSP (ESTADO TODO)
+
+
+FERRAMENTOS QUE MEXO?
+SQL
+POWER BI
+REPORTING
+ETL - INTEGRATION
+DEVOPS
+PHP
+PYTHON
+JAVA BASICO
+R - FIZ TRABALAHO DO DATA SUS DA FACULDADE
+
+
+O QUE SEI?
+
+AREA QUE TRABALAHO?
+TRABALHO COM BI
+
+SUPORTE DA MICROSOFT?
+TEMOS SUPORTE DO MICROSOFT, TUDO PASSA POR CODE REVIEW DELES
