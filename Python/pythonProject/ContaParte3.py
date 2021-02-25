@@ -18,15 +18,23 @@ class Conta:
         self.__saldo += valor
 
     def sacar(self,valor):
-<<<<<<< HEAD
-        self.saldo -= valor
-
-    ##ex: conta =  Conta(123,"Gabriel", 100, 1000)
-    ##    conta = None -> Deste modo desreferenciando a varial conta do objeto Conta.
-=======
         self.__saldo -= valor
 
     def transfere(self,valor,destino): ## EXEMPLO DE ENCAPSULAMENTO
         self.sacar(valor)
         destino.depositar(valor)
->>>>>>> 2d47fc7fe43c6afd05f057b11bed474993ee2f82
+
+    def get_saldo(self):
+        return self.__saldo
+
+    def get_titular(self):
+        return self.__titular
+
+    def get_limite(self):
+        return self.__limite
+
+    def set_limite(self, limite):
+         self.__limite = limite #metodo SET NUNCA tem return
+
+    ##ex: conta =  Conta(123,"Gabriel", 100, 1000)
+    ##    conta = None -> Deste modo desreferenciando a varial conta do objeto Conta.
