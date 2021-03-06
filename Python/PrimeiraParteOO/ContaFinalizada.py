@@ -17,8 +17,15 @@ class Conta:
     def depositar(self,valor):
         self.__saldo += valor
 
+    def __pode_sacar(self,valor_de_saque):  # Exemplo de metodo Privado
+        valor_disponivel = self.__saldo + self.__limite
+        return valor_de_saque <= valor_disponivel
+
     def sacar(self,valor):
-        self.__saldo -= valor
+        if ((self.__pode_sacar(valor))):
+            self.__saldo -= valor
+        else:
+            print("O valor {} passou o limite disponivel".format(valor))
 
     def transfere(self,valor,destino): ## EXEMPLO DE ENCAPSULAMENTO
         self.sacar(valor)
@@ -30,11 +37,24 @@ class Conta:
     def get_titular(self):
         return self.__titular
 
-    def get_limite(self):
+    #def get_limite(self):
+    #    return self.__limite
+
+    #def set_limite(self, limite):
+    #     self.__limite = limite #metodo SET NUNCA tem return
+
+    @property
+    def limite(self):
         return self.__limite
 
-    def set_limite(self, limite):
-         self.__limite = limite #metodo SET NUNCA tem return
+    @limite.setter
+    def limite(self, limite):
+        self.__limite = limite
+
+    @staticmethod
+    def codigo_banco(): # Exemplo de um metodo estático -> executa sem criar o objeto -> Conta.codigo_banco()
+        return "001"
+
 
     ##ex: conta =  Conta(123,"Gabriel", 100, 1000)
     ##    conta = None -> Deste modo desreferenciando a varial conta do objeto Conta.
