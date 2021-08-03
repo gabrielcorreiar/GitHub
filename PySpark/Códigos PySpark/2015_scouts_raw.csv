@@ -1,0 +1,46 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import lit 
+
+appName='Tratamento Dados Cartola 2015'
+sourcePathPartidas='/raw/db_cartola/2015/2015_scouts_raw.csv'
+sourcePathJogadores='/raw/db_cartola/2015/2015_jogadores.csv'
+sourcePathTimes='/raw/db_cartola/2015/2015_times.csv'
+sourcePathPosicoes='/raw/db_cartola/posicoes_ids.csv'
+managePath="/manage/2015_scouts" 
+mode='append'
+ano = 2015
+
+spark = SparkSession.builder.appName(appName).config("spark.debug.maxToStringFields", "100").getOrCreate()
+
+try:	
+	## Importando os dados do HDFS
+	rodadas_2015 = spark.read.csv(sourcePathPartidas,header=True)
+	jogadores_2015 = spark.read.csv(sourcePathJogadores,header=True)
+	times_2015 = spark.read.csv(sourcePathTimes,header=True)
+	posicao_2015 = spark.read.csv(sourcePathPosicoes,header=True)
+
+	# Retirando rodadas que estão com o valor 0
+	rodadas_2015 = rodadas_2015.filter("Rodada <> '0'")
+
+	# Renomeando os campos necessários e adicionando o campo Ano
+	rodadas_2015 = rodadas_2015.withColumnRenamed('AtletaID','Id_Atleta')
+	rodadas_2015 = rodadas_2015.withColumnRenamed('ClubeID','Id_Clube')
+	rodadas_2015 = rodadas_2015.withColumn("Ano", lit(ano))
+
+	# Join para pegar o nome dos Jogadores/Times/Posicao
+	jogadores_2015 = jogadores_2015.join(posicao_2015,jogadores_2015.PosicaoID == posicao_2015.Cod,"inner")
+	rodadas_2015 = rodadas_2015.join(jogadores_2015,rodadas_2015.Id_Atleta == jogadores_2015.ID,"inner") 
+	rodadas_2015 = rodadas_2015.join(times_2015,rodadas_2015.Id_Clube == times_2015.ID,"inner")
+
+	# Renomeando os campos necessários
+	rodadas_2015 = rodadas_2015.withColumnRenamed('Apelido','Atleta')
+	rodadas_2015 = rodadas_2015.withColumnRenamed('Nome','Clube')
+	rodadas_2015 = rodadas_2015.withColumnRenamed('Position','Posicao')
+
+
+	rodadas_tratado_2015 = rodadas_2015.select(['Atleta','Rodada','Clube','Posicao','Pontos','PontosMedia','Preco','PrecoVariacao','Ano'])
+
+	rodadas_tratado_2015.coalesce(1).write.format("csv").option("header", "True").mode(mode).save(managePath)
+
+except:
+  print("Error")

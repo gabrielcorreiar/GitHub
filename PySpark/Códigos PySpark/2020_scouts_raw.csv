@@ -1,0 +1,49 @@
+from pyspark.sql.types import StructField,StringType,IntegerType,StructType
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.functions import lit #Apenas para criar o campo ano
+
+appName='Tratamento Dados Cartola 2020'
+sourcePathPartidas='/raw/db_cartola/2020/rodada-*.csv'
+sourcePathTimes='/manage/times'
+sourcePathJogadores='/raw/db_cartola/2020/2020-medias-jogadores.csv'
+managePath="/manage/2020_scouts" 
+mode='append'
+ano = 2020
+
+spark = SparkSession.builder.appName(appName).config("spark.debug.maxToStringFields", "100").getOrCreate()
+
+try:
+	# Montando o Schema para os dados dos arquivos (id precisa ser String pois vem Registros nulos)
+	data_schema = [StructField('id',StringType(),True),StructField('atletasnome',StringType(),True),StructField('atletasslug',StringType(),True),StructField('atletasapelido',StringType(),True),StructField('atletasfoto',StringType(),True),StructField('Id_Atleta',StringType(),True),StructField('Rodada',StringType(),True),StructField('Id_Clube',StringType(),True),StructField('Posicao',StringType(),True),StructField('atletasstatus_id',StringType(),True),StructField('Pontos',StringType(),True),StructField('Preco',StringType(),True),StructField('PrecoVariacao',StringType(),True),StructField('PontosMedia',StringType(),True),StructField('Jogos',StringType(),True),StructField('atletasclubeidfullname',StringType(),True),StructField('FF',StringType(),True),StructField('FS',StringType(),True),StructField('G',StringType(),True),StructField('PI',StringType(),True),StructField('CA',StringType(),True),StructField('FC',StringType(),True),StructField('DS',StringType(),True),StructField('FT',StringType(),True),StructField('DD',StringType(),True),StructField('GS',StringType(),True),StructField('FD',StringType(),True),StructField('GC',StringType(),True),StructField('SG',StringType(),True),StructField('A',StringType(),True),StructField('I',StringType(),True),StructField('CV',StringType(),True),StructField('PP',StringType(),True)]
+
+	# Vinculando esse Schema em uma variavel
+	estrutura = StructType(fields=data_schema)
+
+	# Importando os dados do HDFS e inserindo-os no Schema acima
+	rodadas_2020 = spark.read.csv(sourcePathPartidas,schema=estrutura,header=False)
+	times_2020 = spark.read.csv(sourcePathTimes,header=True)
+	jogadores_2020 = spark.read.csv(sourcePathJogadores,header=True)
+
+	# Retirando os headers que foram importados
+	rodadas_2020 = rodadas_2020.where(F.col("id").isNotNull())
+
+	rodadas_tratado_2020 = rodadas_2020.select(['Id_Atleta','Rodada','Id_Clube','Posicao','Jogos','Pontos','PontosMedia','Preco','PrecoVariacao'])
+
+	# Adicionando o campo Ano
+	rodadas_tratado_2020 = rodadas_tratado_2020.withColumn("Ano", lit(ano))
+
+	# join com as tabelas de clube e jogador
+	rodadas_tratado_2020 = rodadas_tratado_2020.join(times_2020, rodadas_tratado_2020.Id_Clube == times_2020.id,"Inner")
+	rodadas_tratado_2020 = rodadas_tratado_2020.join(jogadores_2020,rodadas_tratado_2020.Id_Atleta == jogadores_2020.player_id,"Inner")
+
+	# Renomeando os campos necessários
+	rodadas_tratado_2020 = rodadas_tratado_2020.withColumnRenamed('Nome_cartola','Clube')
+	rodadas_tratado_2020 = rodadas_tratado_2020.withColumnRenamed('player_nickname','Atleta')
+
+	rodadas_tratado_2020 = rodadas_tratado_2020.select(['Atleta','Rodada','Clube','Posicao','Pontos','PontosMedia','Preco','PrecoVariacao','Ano'])
+
+	rodadas_tratado_2020.coalesce(1).write.format("csv").option("header", "True").mode(mode).save(managePath)
+
+except:
+  print("Error")

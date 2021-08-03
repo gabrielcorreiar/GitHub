@@ -1,0 +1,41 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import lit #Apenas para criar o campo ano
+
+
+appName='cartola_ano'
+sourcePathPartidas='/raw/db_cartola/2014/2014_partidas_ids.csv'
+sourcePathTimes='/raw/db_cartola/2014/2014_times.csv'
+managePath="/manage/2014_partidas" 
+mode='append'
+ano = 2014
+
+spark = SparkSession.builder.appName(appName).getOrCreate()
+
+try:
+	# importando os arquivos
+	partidas_2014 = spark.read.csv(sourcePathPartidas,header=True)
+	times_2014 = spark.read.csv(sourcePathTimes,header=True)
+
+	# renomeando colunas necessárias
+	partidas_2014 = partidas_2014.withColumnRenamed('ID','Id_partidas')
+	times_2014 = times_2014.withColumnRenamed('ID','Id_times')
+
+	# Join para pegar Time da casa
+	partidas_2014 = partidas_2014.join(times_2014,partidas_2014.Casa == times_2014.Id_times,"inner")
+
+	partidas_2014 = partidas_2014.select('Id_partidas','Rodada','Nome','Visitante','PlacarCasa','PlacarVisitante','Resultado')
+	partidas_2014 = partidas_2014.withColumnRenamed('Nome','Casa')
+
+	# Join para pegar o time visitante
+	partidas_2014 = partidas_2014.join(times_2014,partidas_2014.Visitante == times_2014.Id_times,"inner")
+
+	partidas_2014 = partidas_2014.select('Id_partidas','Rodada','Casa','Nome','PlacarCasa','PlacarVisitante','Resultado')
+	partidas_2014 = partidas_2014.withColumnRenamed('Nome','Visitante')
+
+	# Inserindo a coluna Ano no dataset
+	partidas_2014 = partidas_2014.withColumn("Ano", lit(ano))
+
+	partidas_2014.coalesce(1).write.format("csv").option("header", "True").mode(mode).save(managePath)
+
+except:
+  print("Error")

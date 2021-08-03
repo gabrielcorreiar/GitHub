@@ -1,0 +1,42 @@
+Startar ambiente hadoop
+
+	start-all.sh
+
+Listar dados do hadoop
+
+	hadoop fs -ls /
+
+Criar Pasta
+
+	hadoop fs -mkdir /nome da pasta
+
+Inserir dados no Hadoop
+
+	hadoop fs -put [caminho do arquivo Local] /[caminho do hdfs]
+	Ex: hadoop fs -put doc.csv /tmp -> este comando vai colocar o arquivo dentro do diretório /tmp dentro do Hadoop
+
+Conectar no Hadoop
+
+	hdfs://localhost:9000
+
+Ver HDFS
+
+	localhost:50070
+
+Iniciar o PyCharm
+
+	Entrar na pasta Mozilla -> pasta de download
+
+	Entar na pasta: cd pycharm-community-2021.1/
+
+	Entrar na pasta: cd bin/
+
+	Iniciar o Pycharm: sh pycharm.sh
+
+Ver se os serviçoes estão rodando
+
+	no terminal -> jps
+
+ACESSAR O HUE/HIVE
+
+	Podemos acessar o Hive atavés da interface do Hue acessando a URL: localhost:8888

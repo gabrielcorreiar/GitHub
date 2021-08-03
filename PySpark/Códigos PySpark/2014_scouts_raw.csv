@@ -1,0 +1,49 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import lit #Apenas para criar o campo ano
+
+appName='Tratamento Dados Cartola 2014'
+sourcePathPartidas='/raw/db_cartola/2014/2014_scouts_raw.csv'
+sourcePathJogadores='/raw/db_cartola/2014/2014_jogadores.csv'
+sourcePathTimes='/raw/db_cartola/2014/2014_times.csv'
+sourcePathPosicoes='/raw/db_cartola/posicoes_ids.csv'
+managePath="/manage/2014_scouts" 
+mode='append' 
+ano = 2014
+
+spark = SparkSession.builder.appName(appName).config("spark.debug.maxToStringFields", "100").getOrCreate()
+
+try:
+	## Importando os dados do HDFS 
+	rodadas_2014 = spark.read.csv(sourcePathPartidas,header=True)
+	jogadores_2014 = spark.read.csv(sourcePathJogadores,header=True)
+	times_2014 = spark.read.csv(sourcePathTimes,header=True)
+	posicoes_2014 = spark.read.csv(sourcePathPosicoes,header=True)
+
+	# Selecionando apenas os campos necessários
+	rodadas_tratado_2014 = rodadas_2014.select(['Atleta','Rodada','Clube','Posicao','Pontos','PontosMedia','Preco','PrecoVariacao','Partida','Mando','Titular','Substituido','TempoJogado','Nota'])
+
+	# Retirando rodadas que estão com o valor 0
+	rodadas_tratado_2014 = rodadas_tratado_2014.filter("Rodada <> '0'")
+
+	# Renomeando os campos necessários e adicionando o campo Ano
+	rodadas_tratado_2014 = rodadas_tratado_2014.withColumnRenamed('Atleta','Id_Atleta')
+	rodadas_tratado_2014 = rodadas_tratado_2014.withColumnRenamed('Clube','Id_Clube')
+	rodadas_tratado_2014 = rodadas_tratado_2014.withColumnRenamed('Posicao','Id_Posicao')
+	rodadas_tratado_2014 = rodadas_tratado_2014.withColumn("Ano", lit(ano))
+
+	# Join para pegar o nome dos Jogadores/Times/Posicao
+	rodadas_tratado_2014 = rodadas_tratado_2014.join(jogadores_2014,rodadas_tratado_2014.Id_Atleta == jogadores_2014.ID,"Inner")
+	rodadas_tratado_2014 = rodadas_tratado_2014.join(times_2014,rodadas_tratado_2014.Id_Clube == times_2014.ID,"Inner")
+	rodadas_tratado_2014 = rodadas_tratado_2014.join(posicoes_2014,rodadas_tratado_2014.Id_Posicao == posicoes_2014.Cod,"Inner")
+
+	# Renomeando os campos necessários
+	rodadas_tratado_2014 = rodadas_tratado_2014.withColumnRenamed('Apelido','Atleta')
+	rodadas_tratado_2014 = rodadas_tratado_2014.withColumnRenamed('Nome','Clube')
+	rodadas_tratado_2014 = rodadas_tratado_2014.withColumnRenamed('Position','Posicao')
+
+	rodadas_tratado_2014 = rodadas_tratado_2014.select(['Atleta','Rodada','Clube','Posicao','Pontos','PontosMedia','Preco','PrecoVariacao','Ano'])
+
+	rodadas_tratado_2014.coalesce(1).write.format("csv").option("header", "True").mode(mode).save(managePath)
+
+except:
+  print("Error")

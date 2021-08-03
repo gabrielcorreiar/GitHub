@@ -1,0 +1,27 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import desc
+
+appName='TTratamento Dados Cartola (Times)'
+sourcePathPartidas='/raw/db_cartola/times_ids.csv'
+managePath="/manage/times" 
+mode='append'
+
+spark = SparkSession.builder.appName(appName).getOrCreate()
+
+times = spark.read.csv(sourcePathPartidas,header=True)
+
+# Renomeando os campos necessários
+times = times.withColumnRenamed('nome.cbf','nome_cbf')
+times = times.withColumnRenamed('nome.cartola','nome_cartola')
+times = times.withColumnRenamed('nome.completo','nome_completo')
+times = times.withColumnRenamed('cod.older','cod_older')
+times = times.withColumnRenamed('cod.2017','cod_2017')
+times = times.withColumnRenamed('cod.2018','cod_2018')
+
+##tratando o registro do atlético
+times = times.filter("nome_cartola <> 'Athlético-PR'")
+times = times.filter("nome_cartola <> 'Ceará-SC'")
+
+times = times.select('id','nome_cartola','abreviacao','cod_older','cod_2017','cod_2018').distinct()
+
+times.coalesce(1).write.format("csv").option("header", "True").mode(mode).save(managePath)

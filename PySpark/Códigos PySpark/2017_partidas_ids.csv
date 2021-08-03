@@ -1,0 +1,53 @@
+from pyspark.sql.types import StructField,StringType,StructType
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import lit 
+from pyspark.sql.functions import split, col, when
+
+appName='Tratamento Dados Cartola 2017'
+sourcePathPartidas='/raw/db_cartola/2017/2017_partidas.csv'
+sourcePathTimes='/raw/db_cartola/2017/2017_times.csv'
+managePath="/manage/2017_partidas" 
+mode='append'
+ano = 2017
+
+spark = SparkSession.builder.appName(appName).config("spark.debug.maxToStringFields", "100").getOrCreate()
+
+try:
+    ## Importando os dados do HDFS
+    partidas_2017 = spark.read.csv(sourcePathPartidas,header=True)
+    times_2017 = spark.read.csv(sourcePathTimes,header=True)
+
+    ## Realizando o Split da coluna Score
+    split_col = split(partidas_2017.score, "x",)
+
+    ## Montando o dataset Tratado
+    partidas_2017_tratado = partidas_2017.withColumn("PlacarCasa", split_col.getItem(0)) \
+        .withColumn("PlacarVisitante", split_col.getItem(1)) \
+        .withColumn("Nme_Casa", partidas_2017["home_team"])\
+        .withColumn("Nme_Visitante", partidas_2017["away_team"])\
+        .withColumn("Rodada", partidas_2017["round"])\
+        .drop("round")\
+        .drop("home_team")\
+        .drop("away_team")\
+        .drop("score")\
+        .drop("date")\
+        .drop("arena")
+
+    # Inserindo a coluna Ano
+    partidas_2017_tratado = partidas_2017_tratado.withColumn("Ano", lit(ano))
+
+    ## Realizando um tratamento para trazer o resultado da partida
+    partidas_2017_tratado.createOrReplaceTempView("b")
+    query = "SELECT game as Id,Rodada,Nme_Casa as Casa,Nme_Visitante as Visitante,PlacarCasa,PlacarVisitante," \
+            " Case When sum(PlacarCasa) > sum(PlacarVisitante) then 'Casa' " \
+            "When sum(PlacarCasa) < sum(PlacarVisitante) then 'Visitante' " \
+            "When sum(PlacarCasa) == sum(PlacarVisitante) then 'Empate' " \
+            "end Resultado, Ano from b " \
+            "group by game,Rodada,Casa,Visitante,PlacarCasa,PlacarVisitante,Ano";
+
+    dfa = spark.sql(query)
+
+    dfa.coalesce(1).write.format("csv").option("header", "True").mode(mode).save(managePath)
+
+except:
+  print("Error")

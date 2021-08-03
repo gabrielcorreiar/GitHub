@@ -1,0 +1,66 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import lit #Apenas para criar o campo ano
+from pyspark.sql.window import Window #Apenas para criar o ID autoincrement
+from pyspark.sql.functions import row_number #Apenas para criar o ID autoincrement
+
+appName='Tratamento Dados Cartola 2019'
+sourcePathPartidas='/raw/db_cartola/2019/2019_partidas.csv'
+sourcePathTimes='/manage/times'
+managePath="/manage/2019_partidas" 
+mode='append'
+ano = 2019
+
+
+spark = SparkSession.builder.appName(appName).config("spark.debug.maxToStringFields", "100").getOrCreate()
+
+try:
+    partidas_2019 = spark.read.csv(sourcePathPartidas,header=True)
+    times_2019 = spark.read.csv(sourcePathTimes,header=True)
+
+    ## Renomeando os campos necessários e inserindo o campo Ano
+    partidas_2019 = partidas_2019.withColumnRenamed("home_team","Casa")\
+        .withColumnRenamed("away_team","Visitante")\
+        .withColumnRenamed("home_score","PlacarCasa")\
+        .withColumnRenamed("away_score","PlacarVisitante")\
+        .withColumnRenamed("round","Rodada")
+    partidas_2019 = partidas_2019.withColumn("Ano", lit(ano))
+
+    partidas_2019 = partidas_2019.select("Rodada","Casa","Visitante","PlacarCasa","PlacarVisitante","Ano")
+
+    # Realizando um tratamento para trazer o resultado da partida
+    partidas_2019.createOrReplaceTempView("Partidas")
+
+    query = ("SELECT Rodada,Casa,Visitante,PlacarCasa,PlacarVisitante, "
+             "CASE When SUM(PlacarCasa) > SUM(PlacarVisitante) THEN 'Casa' "
+             "When SUM(PlacarCasa) < SUM(PlacarVisitante) THEN 'Visitante' "
+             "When SUM(PlacarCasa) == SUM(PlacarVisitante) THEN 'Empate' "
+             "END Resultado,Ano "
+             "FROM Partidas "
+             "Group by Rodada,Casa,Visitante,PlacarCasa,PlacarVisitante,Ano")
+
+    df = spark.sql(query)
+
+    # Join com a tabela Times para pegar o time da Casa
+    df = df.join(times_2019, df.Casa == times_2019.id,"Inner")
+
+    df = df.select("Rodada","nome_cartola","Visitante","PlacarCasa","PlacarVisitante","Resultado","Ano")
+
+    ## Renomeando os campos necessários
+    df = df.withColumnRenamed("nome_cartola","Casa")
+
+    # Join com a tabela Times para pegar o time Visitante
+    df = df.join(times_2019, df.Visitante == times_2019.id,"Inner")
+
+    # Criando a coluna ID autoincrement
+    spec = Window.partitionBy().orderBy("Rodada")
+    df = df.withColumn("Id", row_number().over(spec))
+
+    df = df.select("Id","Rodada","Casa","nome_cartola","PlacarCasa","PlacarVisitante","Resultado","Ano")
+
+    ## Renomeando os campos necessários
+    df = df.withColumnRenamed("nome_cartola","Visitante")
+
+    df.coalesce(1).write.format("csv").option("header", "True").mode(mode).save(managePath)
+
+except:
+  print("Error")

@@ -1,0 +1,86 @@
+from pyspark.sql.types import StructField,StringType,IntegerType,StructType
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
+from pyspark.sql.functions import lit #Apenas para criar o campo ano
+
+appName='Tratamento Dados Cartola 2017'
+sourcePathPartidas='/raw/db_cartola/2017/2017_scouts_raw.csv'
+sourcePathJogadores='/raw/db_cartola/2017/2017_jogadores.csv'
+sourcePathTimes='/raw/db_cartola/2017/2017_times.csv'
+sourcePathPosicoes='/raw/db_cartola/posicoes_ids.csv'
+managePath="/manage/2017_scouts" 
+mode='append'
+ano = 2017
+
+
+spark = SparkSession.builder.appName(appName).config("spark.debug.maxToStringFields", "100").getOrCreate()
+
+try:
+
+	## Montando o Schema para os dados dos arquivos (id precisa ser String pois vem Registros nulos)
+	data_schema = [
+	StructField('id',StringType(),True),
+	StructField('A',StringType(),True),
+	StructField('CA',StringType(),True),
+	StructField('CV',StringType(),True),
+	StructField('DD',StringType(),True),
+	StructField('DP',StringType(),True),
+	StructField('FC',StringType(),True),
+	StructField('FD',StringType(),True),
+	StructField('FF',StringType(),True),
+	StructField('FS',StringType(),True),
+	StructField('FT',StringType(),True),
+	StructField('G',StringType(),True),
+	StructField('GC',StringType(),True),
+	StructField('GS',StringType(),True),
+	StructField('I',StringType(),True),
+	StructField('PE',StringType(),True),
+	StructField('PP',StringType(),True),
+	StructField('RB',StringType(),True),
+	StructField('SG',StringType(),True),
+	StructField('atletasscout',StringType(),True),
+	StructField('atletasapelido',StringType(),True),
+	StructField('Atleta', StringType(), True),
+	StructField('atletasclubeidfullname',StringType(),True),
+	StructField('Clube',StringType(),True),
+	StructField('atletasfoto',StringType(),True),
+	StructField('Jogos',StringType(),True),
+	StructField('PontosMedia',StringType(),True),
+	StructField('atletasnome',StringType(),True),
+	StructField('Pontos', StringType(), True),
+	StructField('Posicao',StringType(),True),
+	StructField('Preco',StringType(),True),
+	StructField('Rodada',StringType(),True),
+	StructField('atletasstatus_id',StringType(),True),
+	StructField('PrecoVariacao',StringType(),True),]
+
+	## Vinculando esse Schema em uma variavel
+	estrutura = StructType(fields=data_schema)
+
+	## Importando os dados do HDFS e inserindo-os no Schema acima
+	rodadas_2017 = spark.read.csv(sourcePathPartidas,schema=estrutura,header=False)
+	times_2017 = spark.read.csv(sourcePathTimes,header=True,sep = ';')
+	jogadores_2017 = spark.read.csv(sourcePathJogadores,header=True)
+
+
+	rodadas_tratado_2017 = rodadas_2017.select(['Atleta','Rodada','Clube','Posicao','Pontos','PontosMedia','Preco','PrecoVariacao'])
+
+	# Renomeando os campos necessários e adicionando o campo Ano
+	rodadas_tratado_2017 = rodadas_tratado_2017.withColumn("Ano", lit(ano))
+	rodadas_tratado_2017 = rodadas_tratado_2017.withColumnRenamed('Atleta','Id_Atleta')
+
+	# Retirando rodadas que estão com o valor 0
+	rodadas_tratado_2017 = rodadas_tratado_2017.filter("Rodada <> '0'")
+
+	# Join para pegar o nome dos Jogadores
+	rodadas_tratado_2017 = rodadas_tratado_2017.join(jogadores_2017,rodadas_tratado_2017.Id_Atleta == jogadores_2017.AtletaID,"Inner")
+
+	# Renomeando os campos necessários
+	rodadas_tratado_2017 = rodadas_tratado_2017.withColumnRenamed('Apelido','Atleta')
+
+	rodadas_tratado_2017 = rodadas_tratado_2017.select(['Atleta','Rodada','Clube','Posicao','Pontos','PontosMedia','Preco','PrecoVariacao','Ano'])
+
+	rodadas_tratado_2017.coalesce(1).write.format("csv").option("header", "True").mode(mode).save(managePath)
+
+except:
+  print("Error")

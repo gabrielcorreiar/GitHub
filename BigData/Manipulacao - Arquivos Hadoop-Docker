@@ -1,0 +1,54 @@
+SENHA: dsahadoop
+
+
+MANIPULAÇÃO - ARQUIVOS HADOOP/DOCKER:
+
+## COMO EU JÁ TENHO O AMBIENTE MONTADO NA MINHA MÁQUINA, DEVO SEGUIR OS PASSOS ABAIXO ##
+
+-- PRECISO ACESSAR A PASTA EM QUE TEM OS ARQUIVOS DOCKER --
+
+	sudo docker-compose up -d -> este comando vai iniciar o ambiente hadoop na minha máquina (rodar dentro da pasta BIGDATA_DOCKER)
+
+	sudo docker ps -> este comando vai me mostrar o que está (funcionando) e o container deles
+
+	sudo docker cp "nome do arquivo" "número do container":/"diretório do hfds" -> este comando vai movimentar o arquivo para dentro da pasta hdfs 
+
+		Exemplo: sudo docker cp doc.csv cd23876267:/tmp
+
+	sudo docker exec -it "número do container" bash - > este comando vai executar o container que eu colocar ali e vai por o arquivo dentro dele.
+
+		Exemplo: sudo docker exec -it cd23876267 bash
+
+- Depois do comando acima executado vamos entrar dentro do container -
+	
+	- Lá dentro com o comando "ls" podemos ver o arquivo dentro do nosso container.
+
+## COMANDOS DO HADOOP ##  
+	
+	hadoop fs -mkdir  /tmp -> este comando vai criar o diretório
+
+	hadoop fs -put doc.csv /tmp -> este comando vai colocar o arquivo dentro do diretório /tmp dentro do Hadoop
+
+	hadoop fs -ls /tmp -> este comando vai listar os arquivos que temos dentro deste diretório hadoop
+
+	- Podemos ver o arquivo lá dentro acessando a URL: localhost:50070
+
+## ACESSAR O HUE ##
+
+	 Podemos acessar o Hive atavés da interface do Hue acessando a URL: localhost:8888
+
+## CRIANDO TABELA DENTRO DO HIVE ##
+
+	- SCRIPT:
+
+	CREATE EXTERNAL TABLE doc1(
+	id INT
+	,nome String
+	,idade INT)
+	row format delimeted
+	fields terminated by ';'
+	stored as textfile
+	location '/tmp';
+
+	SELECT * FROM doc1;
+

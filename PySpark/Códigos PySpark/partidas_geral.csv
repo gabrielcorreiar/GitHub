@@ -1,0 +1,14 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import lit #Apenas para criar o campo ano
+from pyspark.sql.functions import count
+
+appName='cartola_ano'
+sourcePathManage='/manage/20*_partidas/'
+mode='append'
+managePath='/manage/partidas_geral'
+
+spark = SparkSession.builder.appName(appName).getOrCreate()
+
+geral = spark.read.csv(sourcePathManage,header=True)
+
+geral.coalesce(1).write.format("csv").option("header", "True").mode(mode).save(managePath)
