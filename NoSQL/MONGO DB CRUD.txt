@@ -1,0 +1,82 @@
+## INSERT ##
+
+var dados = [ 
+{
+Nome: "Gabriel",
+    Idade: 22,
+    Email:"gabriel123@gmail.com",
+    Cidade:"São Paulo"},
+ 
+{
+  Nome: "Rafael",
+    Idade: 34,
+    Email:"rafs3@gmail.com",
+    Cidade:"Rio de Janeiro"}, 
+{
+  Nome: "Joana",
+    Idade: 60,
+    Email:"jonaaan@gmail.com",
+    },
+ 
+{
+  Nome: "Beatriz",
+    Idade: 13,
+    Cidade:"Acre"},
+ 
+{
+  Nome: "Gabriela",
+    Idade: 28,
+    Email:"gabs_ferreira@gmail.com",
+    Cidade:"Araçatuba"},
+{
+  Nome: "Roberta",
+    Idade: 44,
+    Email:"roberta@gmail.com",
+    Cidade:"Anápolis"}, 
+{
+  Nome: "Maju",
+    Idade: 32,
+    Email:"ma_ju_1223@gmail.com",
+    },
+ 
+{
+  Nome: "Jonas",
+    Idade: 25,
+    Email:"jonas_cris@gmail.com",
+    Cidade:"Salvador"}
+]
+
+//inserir os dados 
+db.Pessoas.insert(dados);
+
+
+#######
+
+CONSULTAR DADOS NO BANCO
+
+
+//trás os dados com uma visualização melhor ordenado de A até Z
+	db.Pessoas.find().sort({Nome:+1}).pretty();
+
+// consultar a data de criação do objeto
+ObjectId("5f7117c15383791c527eed84").getTimestamp();
+
+
+ALTERAR DADOS
+
+//altera a idade
+db.Pessoas.update({Nome: "Gabriel"},{$set: {Idade:23}});
+
+//esta retirando a coluna IDADE do registro do Gabriel
+db.Pessoas.update({Nome: "Gabriel"},{$unset:{Idade:""}});
+
+//esta inserindo a coluna IDADE no registro do Gabriel
+db.Pessoas.update({Nome: "Gabriel"},{$set: {Idade: 22}});
+
+
+DELETAR Dados
+
+// deleta os registros da Joana
+db.Pessoas.remove({Nome: "Joana"});
+
+// WEB APP AZURE - PESQUISAR
